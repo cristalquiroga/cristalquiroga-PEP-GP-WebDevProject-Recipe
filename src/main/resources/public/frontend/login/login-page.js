@@ -115,13 +115,12 @@ async function processLogin() {
         // TODO: Handle any network or unexpected errors
         // - Log the error and alert the user
         console.error("Login error: ", error);
-        alert("An error occured during login")
+        alert("An error occured during login.");
     }
 }
 
 async function processLogout(){
     const token = sessionStorage.getItem("auth-token");
-    const tokenBody = {token: token}
 
     const requestOptions = {
         method: "POST",
@@ -131,17 +130,18 @@ async function processLogout(){
         headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "*"
+            "Access-Control-Allow-Headers": "*",
+            "Authorization": `Bearer ${token}` 
         },
         redirect: "follow",
         referrerPolicy: "no-referrer",
-        body: JSON.stringify(tokenBody)
     };
 
     try{
         const response = await fetch(`${BASE_URL}/logout`, requestOptions);
     }catch(error){
         console.error("Logout error: ", error);
+        alert("An error occured during logout.");
     }finally{
         sessionStorage.removeItem("auth-token");
         sessionStorage.removeItem("is-admin");

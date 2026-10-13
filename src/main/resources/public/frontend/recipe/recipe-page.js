@@ -16,15 +16,34 @@ window.addEventListener("DOMContentLoaded", () => {
      * - Admin link and logout button
      * - Search input
     */
-
+    let addRecipeNameInput = document.getElementById("add-recipe-name-input");
+    let addRecipeInstructionsInput = document.getElementById("add-recipe-instructions-input");
+    let addRecipeButton = document.getElementById("add-recipe-submit-input")
+    let updateRecipeNameInput = document.getElementById("update-recipe-name-input");
+    let updateRecipeInstructionsInput = document.getElementById("update-recipe-instructions-input");
+    let updateRecipeButton = document.getElementById("update-recipe-submit-input");
+    let deleteRecipeNameInput = document.getElementById("delete-recipe-name-input");
+    let deleteRecipeButton = document.getElementById("delete-recipe-submit-input");
+    let recipeList = document.getElementById("recipe-list");
+    let adminLink = document.getElementById("admin-link");
+    let logoutButton = document.getElementById("logout-button");
+    let searchInput = document.getElementById("search-input");
+    let searchButton = document.getElementById("search-button");
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
      */
+    if(sessionStorage.getItem("auth-token")){
+        logoutButton.style.display = "block";
+    }
 
     /*
      * TODO: Show admin link if is-admin flag in sessionStorage is "true"
      */
-
+    function displayAdminLink(){
+        if(sessionStorage.getItem("is-admin") === "true"){
+            adminLink.style.display = "block";
+        }
+    }
     /*
      * TODO: Attach event handlers
      * - Add recipe button → addRecipe()
@@ -33,11 +52,17 @@ window.addEventListener("DOMContentLoaded", () => {
      * - Search button → searchRecipes()
      * - Logout button → processLogout()
      */
+    addRecipeButton.onclick = addRecipe;
+    updateRecipeButton.onclick = updateRecipe;
+    deleteRecipeButton.onclick = deleteRecipe;
+    searchButton.onclick = searchRecipes;
+    logoutButton.onclick = processLogout;
 
     /*
      * TODO: On page load, call getRecipes() to populate the list
      */
-
+    getRecipes();
+    displayAdminLink();
 
     /**
      * TODO: Search Recipes Function
@@ -48,6 +73,37 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function searchRecipes() {
         // Implement search logic here
+        let searchTerm = searchInput.value;
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/recipes?name=${encodeURIComponent(searchTerm)}`, requestOptions);
+            if(response.status === 200){
+                recipes = await response.json();
+                refreshRecipeList();
+            }
+            else{
+                alert("Search failed.")
+            }
+        }catch(error){
+            console.error("Search error: ", error);
+            alert("An error occured during search.");
+        }
     }
 
     /**
