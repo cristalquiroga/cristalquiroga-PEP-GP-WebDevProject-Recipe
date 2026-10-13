@@ -8,12 +8,16 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * TODO: Get references to various DOM elements
  * - usernameInput, emailInput, passwordInput, repeatPasswordInput, registerButton
  */
-
+let usernameInput = document.getElementById("username-input");
+let emailInput = document.getElementById("email-input");
+let passwordInput = document.getElementById("password-input");
+let repeatPasswordInput = document.getElementById("repeat-password-input");
+let registerButton = document.getElementById("register-button");
 
 /* 
  * TODO: Ensure the register button calls processRegistration when clicked
  */
-
+registerButton.onclick = processRegistration;
 
 /**
  * TODO: Process Registration Function
@@ -40,9 +44,20 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  */
 async function processRegistration() {
     // Implement registration logic here
+    let username = usernameInput.value;
+    let email = emailInput.value;
+    let password = passwordInput.value;
+    let repeatPassword = repeatPasswordInput.value;
+
+    if(!username || !email || !password || !repeatPassword){
+        return;
+    }
+    if(password !== repeatPassword){
+        return;
+    }
 
     // Example placeholder:
-    // const registerBody = { username, email, password };
+    const registerBody = { username, email, password };
 const requestOptions = {
         method: "POST",
         mode: "cors",
@@ -58,4 +73,19 @@ const requestOptions = {
         body: JSON.stringify(registerBody)
     };
     // await fetch(...)
+    try{
+        const response = await fetch(`${BASE_URL}/register`, requestOptions);
+        if(response.status === 201){
+            window.location.href = "login.html";
+        }
+        else if(response.status === 409){
+            alert("Username or email already exists.")
+        }
+        else{
+            alert("Registration failed.")
+        }
+    }catch(error){
+        console.error("Registration error: ", error);
+        alert("An error occured during registration.")
+    }
 }
