@@ -21,6 +21,7 @@ let logoutButton = document.getElementById("logout-button");
  * - Call processLogin on click
  */
 loginButton.addEventListener("click", processLogin);
+logoutButton.addEventListener("click", processLogout);
 
 /**
  * TODO: Process Login Function
@@ -83,8 +84,8 @@ async function processLogin() {
         if(response.status === 200){
             const responseText = await response.text();
             const [token, isAdmin] = responseText.split(" ");
-            sessionStorage.setItem("token", token);
-            sessionStorage.setItem("isAdmin", isAdmin);
+            sessionStorage.setItem("auth-token", token);
+            sessionStorage.setItem("is-admin", isAdmin);
         
 
         // TODO: Optionally show the logout button if applicable
@@ -116,5 +117,26 @@ async function processLogin() {
         console.error("Login error: ", error);
         alert("An error occured during login")
     }
+}
+
+async function processLogout(){
+    const token = sessionStorage.getItem("auth-token");
+
+    const requestOptions = {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*"
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(requestBody)
+    };
+
+    
 }
 
