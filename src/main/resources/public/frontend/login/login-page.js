@@ -85,28 +85,36 @@ async function processLogin() {
             const [token, isAdmin] = responseText.split(" ");
             sessionStorage.setItem("token", token);
             sessionStorage.setItem("isAdmin", isAdmin);
-        }
+        
 
         // TODO: Optionally show the logout button if applicable
-        if(logoutButton){
-            logoutButton.style.display = "block";
-        }
+            if(logoutButton){
+                logoutButton.style.display = "block";
+            }
 
         // TODO: Add a small delay (e.g., 500ms) using setTimeout before redirecting
         // - Use window.location.href to redirect to the recipe page
-        setTimeout(() => {
-            window.location.href = "../"
-        })
-
+            setTimeout(() => {
+                window.location.href = "../recipe/recipe-page.html";
+            }, 500);
+        }
         // TODO: If response status is 401
         // - Alert the user with "Incorrect login!"
+        else if(response.status === 401){
+            alert("Incorrect login!");
+        }
 
         // TODO: For any other status code
         // - Alert the user with a generic error like "Unknown issue!"
+        else{
+            alert("Unknown issue!");
+        }
 
     } catch (error) {
         // TODO: Handle any network or unexpected errors
         // - Log the error and alert the user
+        console.error("Login error: ", error);
+        alert("An error occured during login")
     }
 }
 
