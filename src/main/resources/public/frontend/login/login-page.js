@@ -121,6 +121,7 @@ async function processLogin() {
 
 async function processLogout(){
     const token = sessionStorage.getItem("auth-token");
+    const tokenBody = {token: token}
 
     const requestOptions = {
         method: "POST",
@@ -134,9 +135,17 @@ async function processLogout(){
         },
         redirect: "follow",
         referrerPolicy: "no-referrer",
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(tokenBody)
     };
 
-    
+    try{
+        const response = await fetch(`${BASE_URL}/logout`, requestOptions);
+    }catch(error){
+        console.error("Logout error: ", error);
+    }finally{
+        sessionStorage.removeItem("auth-token");
+        sessionStorage.removeItem("is-admin");
+        window.location.href = "../login/login-page.html";
+    }
 }
 
