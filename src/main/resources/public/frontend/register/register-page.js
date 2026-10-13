@@ -50,9 +50,11 @@ async function processRegistration() {
     let repeatPassword = repeatPasswordInput.value;
 
     if(!username || !email || !password || !repeatPassword){
+        alert("All fields must be filled.")
         return;
     }
     if(password !== repeatPassword){
+        alert("Password and Repeat-Password do not match.")
         return;
     }
 
@@ -76,7 +78,7 @@ const requestOptions = {
     try{
         const response = await fetch(`${BASE_URL}/register`, requestOptions);
         if(response.status === 201){
-            window.location.href = "login.html";
+            window.location.href = "../login/login-page.html";
         }
         else if(response.status === 409){
             alert("Username or email already exists.")
