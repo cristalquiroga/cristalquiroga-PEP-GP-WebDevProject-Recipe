@@ -12,6 +12,8 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - searchInput (optional for future use)
  * - adminLink (if visible conditionally)
  */
+let addIngredientNameInput = document.getElementById("add-ingredient-name-input");
+let deleteIngredientNameInput = document.getElementById("delete-ingredient-name-input");
 
 
 /* 
