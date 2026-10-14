@@ -79,7 +79,6 @@ async function addIngredient() {
         if(response.status === 201){
             addIngredientNameInput.value = "";
             await getIngredients();
-            refreshIngredientList();
         }
         else{
             alert("Failed to add Ingredient.")
@@ -154,12 +153,21 @@ async function deleteIngredient() {
         return;
     }
 
-    await getIngredients();
-    const targetIngredient = ingredients.find(recipe => recipe.name.toLowerCase() === deleteRecipeName.toLowerCase());
-    if(!targetRecipe){
-        alert("Recipe not found.");
+    const liElements = ingredientListContainer.querySelectorAll("li");
+    let found = false;
+
+    for(let li of liElements){
+        if(li.textContent.trim().toLowerCase() === deleteIngredientName.toLowerCase()){
+            found = true;
+            break;
+        }
+    }
+    if(!found){
+        alert("Ingredient not found.");
         return;
     }
+
+    const targetIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() === deleteIngredientName.toLowerCase());
 
     let token = sessionStorage.getItem("auth-token");
 
@@ -179,17 +187,17 @@ async function deleteIngredient() {
     };
 
     try{
-        const response = await fetch(`${BASE_URL}/recipes/${targetRecipe.id}`, requestOptions);
+        const response = await fetch(`${BASE_URL}/ingredients/${targetIngredient.id}`, requestOptions);
         if(response.status === 200){
-            deleteRecipeNameInput.value = "";
-            await getRecipes();
+            deleteIngredientNameInput.value = "";
+            await getIngredients();
         }
         else{
-            alert("Failed to delete recipe.")
+            alert("Failed to delete Ingredient.")
         }
     }catch(error){
-        console.error("Delete recipe error: ", error);
-        alert("An error occured while deleting the recipe.");
+        console.error("Delete ingredient error: ", error);
+        alert("An error occured while deleting the ingredient.");
     }
 }
 
@@ -206,4 +214,12 @@ async function deleteIngredient() {
  */
 function refreshIngredientList() {
     // Implement ingredient list rendering logic here
+    ingredientListContainer.innerHTML = "";
+    ingredients.forEach(ingredient => {
+        let li = document.createElement("li");
+        let p = document.createElement("p");
+        p.textContent = ingredient.name;
+        li.appendchild(p);
+        ingredientListContainer.appendChild(li);
+    });
 }
