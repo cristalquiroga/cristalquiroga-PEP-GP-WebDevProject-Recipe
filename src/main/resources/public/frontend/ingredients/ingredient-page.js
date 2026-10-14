@@ -219,7 +219,7 @@ function refreshIngredientList() {
         let li = document.createElement("li");
         let p = document.createElement("p");
         p.textContent = ingredient.name;
-        li.appendchild(p);
+        li.appendChild(p);
         ingredientListContainer.appendChild(li);
     });
 }
