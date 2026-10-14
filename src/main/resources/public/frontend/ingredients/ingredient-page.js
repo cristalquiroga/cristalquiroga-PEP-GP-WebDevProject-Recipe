@@ -152,8 +152,6 @@ async function deleteIngredient() {
         alert("All fields must be filled.");
         return;
     }
-
-    await getIngredients();
     
     const liElements = ingredientListContainer.querySelectorAll("li");
     let found = false;
@@ -170,10 +168,6 @@ async function deleteIngredient() {
     }
 
     const targetIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() === deleteIngredientName.toLowerCase());
-    if(!targetIngredient){
-        alert("Ingredient not found.")
-        return;
-    }
 
     let token = sessionStorage.getItem("auth-token");
 
@@ -194,7 +188,7 @@ async function deleteIngredient() {
 
     try{
         const response = await fetch(`${BASE_URL}/ingredients/${targetIngredient.id}`, requestOptions);
-        if(response.status === 200){
+        if(response.status === 204){
             deleteIngredientNameInput.value = "";
             await getIngredients();
         }
