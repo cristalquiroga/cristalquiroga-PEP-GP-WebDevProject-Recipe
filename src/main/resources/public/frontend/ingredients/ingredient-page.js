@@ -13,23 +13,28 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - adminLink (if visible conditionally)
  */
 let addIngredientNameInput = document.getElementById("add-ingredient-name-input");
+let addIngredientButton = document.getElementById("add-ingredient-submit-button");
 let deleteIngredientNameInput = document.getElementById("delete-ingredient-name-input");
-
+let deleteIngredientButton = document.getElementById("delete-ingredient-submit-button");
+let ingredientListContainer = document.getElementById("ingredient-list");
 
 /* 
  * TODO: Attach 'onclick' events to:
  * - "add-ingredient-submit-button" → addIngredient()
  * - "delete-ingredient-submit-button" → deleteIngredient()
  */
+addIngredientButton.onclick = addIngredient;
+deleteIngredientButton.onclick = deleteIngredient;
 
 /*
  * TODO: Create an array to keep track of ingredients
  */
+let ingredients = [];
 
 /* 
  * TODO: On page load, call getIngredients()
  */
-
+getIngredients();
 
 /**
  * TODO: Add Ingredient Function
@@ -44,6 +49,45 @@ let deleteIngredientNameInput = document.getElementById("delete-ingredient-name-
  */
 async function addIngredient() {
     // Implement add ingredient logic here
+    let addIngredientName = addIngredientNameInput.value.trim();
+    if(!addIngredientName){
+        alert("All fields must be filled.");
+        return;
+    }
+
+    let requestBody = { name: addIngredientName };
+    let token = sessionStorage.getItem("auth-token");
+
+    const requestOptions = {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Authorization": `Bearer ${token}` 
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(requestBody)
+    };
+
+    try{
+        const response = await fetch(`${BASE_URL}/ingredients`, requestOptions);
+        if(response.status === 201){
+            addIngredientNameInput.value = "";
+            await getIngredients();
+            refreshIngredientList();
+        }
+        else{
+            alert("Failed to add Ingredient.")
+        }
+    }catch(error){
+        console.error("Add ingredient error: ", error);
+        alert("An error occured while adding the ingredient.");
+    }
 }
 
 
@@ -58,6 +102,36 @@ async function addIngredient() {
  */
 async function getIngredients() {
     // Implement get ingredients logic here
+    let token = sessionStorage.getItem("auth-token");
+
+    const requestOptions = {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Authorization": `Bearer ${token}` 
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer"
+    };
+
+    try{
+        const response = await fetch(`${BASE_URL}/ingredients`, requestOptions);
+        if(response.status === 200){
+            ingredients = await response.json();
+            refreshIngredientList();
+        }
+        else{
+            alert("Failed to get ingredients.")
+        }
+    }catch(error){
+        console.error("Get ingredients error: ", error);
+        alert("An error occured while getting the ingredients.");
+    }
 }
 
 
@@ -74,6 +148,49 @@ async function getIngredients() {
  */
 async function deleteIngredient() {
     // Implement delete ingredient logic here
+    let deleteIngredientName = deleteIngredientNameInput.value.trim();
+    if(!deleteIngredientName){
+        alert("All fields must be filled.");
+        return;
+    }
+
+    await getIngredients();
+    const targetIngredient = ingredients.find(recipe => recipe.name.toLowerCase() === deleteRecipeName.toLowerCase());
+    if(!targetRecipe){
+        alert("Recipe not found.");
+        return;
+    }
+
+    let token = sessionStorage.getItem("auth-token");
+
+    const requestOptions = {
+        method: "DELETE",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Authorization": `Bearer ${token}` 
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer"
+    };
+
+    try{
+        const response = await fetch(`${BASE_URL}/recipes/${targetRecipe.id}`, requestOptions);
+        if(response.status === 200){
+            deleteRecipeNameInput.value = "";
+            await getRecipes();
+        }
+        else{
+            alert("Failed to delete recipe.")
+        }
+    }catch(error){
+        console.error("Delete recipe error: ", error);
+        alert("An error occured while deleting the recipe.");
+    }
 }
 
 
