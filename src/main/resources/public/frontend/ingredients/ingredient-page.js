@@ -170,6 +170,10 @@ async function deleteIngredient() {
     }
 
     const targetIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() === deleteIngredientName.toLowerCase());
+    if(!targetIngredient){
+        alert("Ingredient not found.")
+        return;
+    }
 
     let token = sessionStorage.getItem("auth-token");
 
