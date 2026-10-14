@@ -167,6 +167,7 @@ async function deleteIngredient() {
         return;
     }
 
+    await getIngredients();
     const targetIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() === deleteIngredientName.toLowerCase());
 
     let token = sessionStorage.getItem("auth-token");
