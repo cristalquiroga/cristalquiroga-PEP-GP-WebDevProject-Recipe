@@ -19,14 +19,20 @@ window.addEventListener("DOMContentLoaded", () => {
     let addRecipeNameInput = document.getElementById("add-recipe-name-input");
     let addRecipeInstructionsInput = document.getElementById("add-recipe-instructions-input");
     let addRecipeButton = document.getElementById("add-recipe-submit-input")
+
     let updateRecipeNameInput = document.getElementById("update-recipe-name-input");
     let updateRecipeInstructionsInput = document.getElementById("update-recipe-instructions-input");
     let updateRecipeButton = document.getElementById("update-recipe-submit-input");
+
     let deleteRecipeNameInput = document.getElementById("delete-recipe-name-input");
     let deleteRecipeButton = document.getElementById("delete-recipe-submit-input");
+
     let recipeList = document.getElementById("recipe-list");
+
     let adminLink = document.getElementById("admin-link");
+
     let logoutButton = document.getElementById("logout-button");
+
     let searchInput = document.getElementById("search-input");
     let searchButton = document.getElementById("search-button");
     /*
@@ -73,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function searchRecipes() {
         // Implement search logic here
-        let searchTerm = searchInput.value;
+        let searchTerm = searchInput.value.trim();
         let token = sessionStorage.getItem("auth-token");
 
         const requestOptions = {
@@ -88,7 +94,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 "Authorization": `Bearer ${token}` 
             },
             redirect: "follow",
-            referrerPolicy: "no-referrer",
+            referrerPolicy: "no-referrer"
         };
 
         try{
@@ -116,6 +122,46 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function addRecipe() {
         // Implement add logic here
+        let addRecipeName = addRecipeNameInput.value.trim();
+        let addRecipeInstructions = addRecipeInstructionsInput.value.trim();
+        if(!addRecipeName || !addRecipeInstructions){
+            alert("All fields must be filled.");
+            return;
+        }
+
+        let requestBody = { name: addRecipeName, instructions: addRecipeInstructions };
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(requestBody)
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/recipes`, requestOptions);
+            if(response.status === 201){
+                addRecipeNameInput.value = "";
+                addRecipeInstructionsInput.value = "";
+                await getRecipes();
+            }
+            else{
+                alert("Failed to add recipe.")
+            }
+        }catch(error){
+            console.error("Add recipe error: ", error);
+            alert("An error occured while adding the recipe.");
+        }
     }
 
     /**
@@ -128,6 +174,53 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function updateRecipe() {
         // Implement update logic here
+        let updateRecipeName = updateRecipeNameInput.value.trim();
+        let updateRecipeInstructions = updateRecipeInstructionsInput.value.trim();
+        if(!updateRecipeName || !updateRecipeInstructions){
+            alert("All fields must be filled.");
+            return;
+        }
+
+        await getRecipes();
+        const targetRecipe = recipes.find(recipe => recipe.name.toLowerCase() === updateRecipeName.toLowerCase());
+        if(!targetRecipe){
+            alert("Recipe not found.");
+            return;
+        }
+
+        let requestBody = { name: updateRecipeName, instructions: updateRecipeInstructions };
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "PUT",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(requestBody)
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/recipes/${targetRecipe.id}`, requestOptions);
+            if(response.status === 200){
+                updateRecipeNameInput.value = "";
+                updateRecipeInstructionsInput.value = "";
+                await getRecipes();
+            }
+            else{
+                alert("Failed to update recipe.")
+            }
+        }catch(error){
+            console.error("Update recipe error: ", error);
+            alert("An error occured while updating the recipe.");
+        }
     }
 
     /**
@@ -139,6 +232,49 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function deleteRecipe() {
         // Implement delete logic here
+        let deleteRecipeName = deleteRecipeNameInput.value.trim();
+        if(!deleteRecipeName){
+            alert("All fields must be filled.");
+            return;
+        }
+
+        await getRecipes();
+        const targetRecipe = recipes.find(recipe => recipe.name.toLowerCase() === deleteRecipeName.toLowerCase());
+        if(!targetRecipe){
+            alert("Recipe not found.");
+            return;
+        }
+
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "DELETE",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer"
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/recipes/${targetRecipe.id}`, requestOptions);
+            if(response.status === 200){
+                deleteRecipeNameInput.value = "";
+                await getRecipes();
+            }
+            else{
+                alert("Failed to delete recipe.")
+            }
+        }catch(error){
+            console.error("Delete recipe error: ", error);
+            alert("An error occured while deleting the recipe.");
+        }
     }
 
     /**
@@ -149,6 +285,36 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function getRecipes() {
         // Implement get logic here
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer"
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/recipes`, requestOptions);
+            if(response.status === 200){
+                recipes = await response.json();
+                refreshRecipeList();
+            }
+            else{
+                alert("Failed to get recipes.")
+            }
+        }catch(error){
+            console.error("Get recipe error: ", error);
+            alert("An error occured while getting the recipe.");
+        }
     }
 
     /**
@@ -159,6 +325,12 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     function refreshRecipeList() {
         // Implement refresh logic here
+        recipeList.innerHTML = "";
+        recipes.forEach(recipe => {
+            let li = document.createElement("li");
+            li.textContent = `${recipe.name}: ${recipe.instructions}`;
+            recipeList.appendChild(li);
+        });
     }
 
     /**
@@ -170,6 +342,33 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function processLogout() {
         // Implement logout logic here
+        let token = sessionStorage.getItem("auth-token");
+
+        const requestOptions = {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Authorization": `Bearer ${token}` 
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer"
+        };
+
+        try{
+            const response = await fetch(`${BASE_URL}/logout`, requestOptions);
+        }catch(error){
+            console.error("Logout error: ", error);
+            alert("An error occured during logout.");
+        }finally{
+            sessionStorage.removeItem("auth-token");
+            sessionStorage.removeItem("is-admin");
+            window.location.href = "../login/login-page.html";
+        }
     }
 
 });

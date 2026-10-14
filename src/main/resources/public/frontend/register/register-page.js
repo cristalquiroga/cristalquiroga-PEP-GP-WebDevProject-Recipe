@@ -44,10 +44,10 @@ registerButton.onclick = processRegistration;
  */
 async function processRegistration() {
     // Implement registration logic here
-    let username = usernameInput.value;
-    let email = emailInput.value;
-    let password = passwordInput.value;
-    let repeatPassword = repeatPasswordInput.value;
+    let username = usernameInput.value.trim();
+    let email = emailInput.value.trim();
+    let password = passwordInput.value.trim();
+    let repeatPassword = repeatPasswordInput.value.trim();
 
     if(!username || !email || !password || !repeatPassword){
         alert("All fields must be filled.")
